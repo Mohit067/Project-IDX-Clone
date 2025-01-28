@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { useCreateProject } from "../hooks/apis/mutations/useCreateProject"
 import { Button, Layout  } from "antd";
 
@@ -35,12 +36,15 @@ export const CreateProject = () => {
 
     const { Header, Footer, Content } = Layout;
 
+    const navigate = useNavigate();
+
     const { createProjectMutation, isPending } = useCreateProject();
     async function handleCreateProject() {
         console.log("goind to trigger api");
         try {
-            await createProjectMutation();
+            const response = await createProjectMutation();
             console.log("Now we should redirect to the editor");
+            navigate(`/project/${response.data}`)
         } catch (error) {
             console.log("Error in creating project", error);
         }
