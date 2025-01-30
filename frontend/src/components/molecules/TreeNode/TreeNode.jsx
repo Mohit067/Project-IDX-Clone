@@ -1,78 +1,81 @@
 import { useState } from "react";
 import { IoIosArrowDown, IoIosArrowForward } from "react-icons/io";
 import { FileIcon } from "../../atoms/FileIcon/FileIcon";
+import { useEditorSocketStore } from "../../../store/editorSocketStore";
+import { useFileContextMenuStore } from "../../../store/fileContextMenuStore";
 
-export const TreeNode = ({
+export const TreeNode = ({ fileFolderData }) => {
+    const [visibility, setVisibility] = useState({}); // Tracks folder visibility
+    const { editorSocket } = useEditorSocketStore();
+    const { setFile, setIsOpen, setX, setY } = useFileContextMenuStore();
 
-    fileFolderData
+    // Toggle folder visibility
+    const toggleVisibility = (name) => {
+        setVisibility((prev) => ({ ...prev, [name]: !prev[name] }));
+    };
 
-}) => {
+    // Extract file extension
+    const computeExtension = (fileName) => fileName.split(".").pop();
 
-    const [visibility, setVisibility] = useState({});
+    // Handle file double-click
+    const handleDoubleClick = (fileFolderData) => {
+        if (!fileFolderData?.path || !editorSocket?.connected) {
+            console.error("Invalid data or socket not connected");
+            return;
+        }
+        editorSocket.emit("readFile", { pathTofileOrFolder: fileFolderData.path });
+    };
 
-    function toggleVisibility(name){
-        setVisibility({
-            ...visibility,
-            [name]: !visibility[name]
-        })
-    }
+    // Handle file right-click (context menu)
+    const handleContextMenuForFiles = (e, path) => {
+        e.preventDefault();
+        setFile(path);
+        setX(e.clientX);
+        setY(e.clientY);
+        setIsOpen(true);
+    };
 
-    function computeExtention(fileFolderData){
-        const names = fileFolderData.name.split('.');
-        return names[names.length - 1];
-    }
+    if (!fileFolderData) return null; // Skip rendering if no data
 
     return (
-        ( fileFolderData &&
-        <div
-            style={{
-                paddingLeft: "15px",
-                color: "while"
-            }}
-        >
-            {fileFolderData.children /** if the current node is a folder ? */? (
-                /** if the current node is a folder, render this button */
+        <div style={{ paddingLeft: "15px", color: "white" }}>
+            {fileFolderData.children ? (
+                // Render folder with toggle button
                 <button
-                    
-                    onClick={() => { toggleVisibility(fileFolderData.name) }}
+                    onClick={() => toggleVisibility(fileFolderData.name)}
                     style={{
                         border: "none",
                         cursor: "pointer",
-                        outline: "none",
-                        color: "white",
                         background: "transparent",
-                        paddingTop: "15px",
-                        fontSize: "16px",
-
+                        padding: "5px",
+                        fontSize: "20px",
+                        display: "flex",
+                        alignItems: "center",
+                        color: "white",
                     }}
                 >
                     {visibility[fileFolderData.name] ? <IoIosArrowDown /> : <IoIosArrowForward />}
-                    {fileFolderData.name}
+                    <span style={{ marginLeft: "5px" }}>{fileFolderData.name}</span>
                 </button>
             ) : (
-                /** If the current node is not folder, show it as a p tag */
-                <div style={{ display:"flex", alignItems:"center" }}>
-                    <FileIcon extension={computeExtention(fileFolderData)}/>
+                // Render file with icon and name
+                <div style={{ display: "flex", alignItems: "center" }}>
+                    <FileIcon extension={computeExtension(fileFolderData.name)} />
                     <p
-                        style={{
-                            paddingTop: "5px",
-                            fontSize: "15px",
-                            cursor: "pointer",
-                            margin: "5px"
-                        }}
+                        style={{ padding: "5px", fontSize: "20px", cursor: "pointer", margin: "5px" }}
+                        onContextMenu={(e) => handleContextMenuForFiles(e, fileFolderData.path)}
+                        onDoubleClick={() => handleDoubleClick(fileFolderData)}
                     >
                         {fileFolderData.name}
                     </p>
                 </div>
             )}
-            {visibility[fileFolderData.name] && fileFolderData.children && (
-                fileFolderData.children.map((child) => (
-                    <TreeNode 
-                        fileFolderData={child}
-                        key={child.name}
-                    />
-                ))
-            )}
-        </div> )
-    )
-}
+
+            {/* Render children if folder is expanded */}
+            {visibility[fileFolderData.name] &&
+                fileFolderData.children?.map((child) => (
+                    <TreeNode fileFolderData={child} key={child.path} />
+                ))}
+        </div>
+    );
+};
