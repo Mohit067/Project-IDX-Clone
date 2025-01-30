@@ -55,7 +55,7 @@ editorNamespace.on("connection", (socket) => {
         });
     }
 
-    handleEditorSocketEvent(socket);
+    handleEditorSocketEvent(socket, editorNamespace);
 
     // socket.on("disconnect", async () => {
     //     await watcher.close();

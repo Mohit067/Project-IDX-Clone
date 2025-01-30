@@ -1,11 +1,12 @@
 import fs from "fs/promises"; 
 
-export const handleEditorSocketEvent = (socket) => {
+export const handleEditorSocketEvent = (socket, editorNamespace) => {
     socket.on("writeFile", async( { data, pathTofileOrFolder }) => {
         try {
             const response = await fs.writeFile(pathTofileOrFolder, data);
-            socket.emit("wirteFileSuccess", {
-                data: "data wirtten successfully"
+            editorNamespace.emit("wirteFileSuccess", {
+                data: "data wirtten success",
+                path: pathTofileOrFolder,
             })
         } catch (error) {
             console.log("error wirting the file", error);
@@ -26,8 +27,8 @@ export const handleEditorSocketEvent = (socket) => {
         }    
         try {
             const response = await fs.writeFile(pathTofileOrFolder, "");
-            socket.emit("createFileSuccessfully", {
-                data: "File create successfully"
+            socket.emit("createFileSuccess", {
+                data: "File create success"
             });
         } catch (error) {
             console.log("error creating the file", error);
@@ -51,13 +52,13 @@ export const handleEditorSocketEvent = (socket) => {
                 data: "error reading the file",
             });
         }
-    });
+    }); 
 
     socket.on("deleteFile", async( { pathTofileOrFolder }) => {
         try {
             const response = await fs.unlink(pathTofileOrFolder);
-            socket.emit("deleteFileSuccessfully", {
-                data: "File delete successfully",
+            socket.emit("deleteFileSuccess", {
+                data: "File delete success",
             });
         } catch (error) {
             console.log("error deleting the file", error);
@@ -70,8 +71,8 @@ export const handleEditorSocketEvent = (socket) => {
     socket.on("createFolder", async ({ pathTofileOrFolder }) => {
         try {
             const response = await fs.mkdir(pathTofileOrFolder);
-            socket.emit("createFolderSuccessfully", {
-                data: "Folder create successfully",
+            socket.emit("createFolderSuccess", {
+                data: "Folder create success",
             });
         } catch (error) {
             console.log("Error creating the folder", error);
@@ -84,8 +85,8 @@ export const handleEditorSocketEvent = (socket) => {
     socket.on("deleteFolder", async( { pathTofileOrFolder }) => {
         try {
             const response = await fs.rmdir(pathTofileOrFolder, { recursive: true });
-            socket.emit("deleteFolderFileSuccessfully", {
-                data: "File deleteFolder successfully",
+            socket.emit("deleteFolderFileSuccess", {
+                data: "File deleteFolder success",
             });
         } catch (error) {
             console.log("error deleting the Folder", error);
@@ -105,8 +106,8 @@ export const handleEditorSocketEvent = (socket) => {
             // Rename (move) the file or folder
             await fs.rename(pathTofileOrFolder, newPath);
 
-            socket.emit("renameFileOrFolderSuccessfully", {
-                data: "File/Folder renamed successfully",
+            socket.emit("renameFileOrFolderSuccess", {
+                data: "File/Folder renamed success",
             });
         } catch (error) {
             if (error.code === "ENOENT") {
