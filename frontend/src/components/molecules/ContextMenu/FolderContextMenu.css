@@ -1,0 +1,34 @@
+.folderContextButton {
+    color: white;
+    outline: none;
+    border: none;
+    width: 100px;
+    height: 40px;
+    cursor: pointer;
+    background: #363545;
+    padding: 5px;
+    transition: background-color 0.2s ease;
+}
+
+.folderContextButton:hover {
+    background-color: #4d4b4b;
+}
+
+.folderContextOptionWrapper {
+    width: 100px;
+    position: fixed;
+    border: 1.5px solid black;
+    background: white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+}
+
+.folderContextOption {
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.folderContextOption:hover {
+    background-color: #f0f0f0;
+}

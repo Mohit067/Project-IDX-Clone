@@ -1,54 +1,60 @@
-/* .fileContextButton {
-    color: white;
-    outline: none;
-    border: none;
-    width: 100px;
-    height: 30px;
-    cursor: pointer;
-    background: #363545;
-    padding: 5px;
-}
-
-.fileContextButton:hover{
-    background-color: #4d4b4b;
-}
-
-.fileContextOptionWrapper {
-    width: 100px;
-    position: fixed;
-    border: 1.5px solid black;
-} */
 .fileContextButton {
     color: white;
     outline: none;
     border: none;
-    width: 100px;
-    height: 30px;
+    width: 160px;
+    height: 36px;
     cursor: pointer;
     background: #363545;
-    padding: 5px;
-    transition: background-color 0.2s ease;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .fileContextButton:hover {
     background-color: #4d4b4b;
+    transform: translateY(-1px); /* Lift effect on hover */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.fileContextButton:active {
+    transform: translateY(0); /* Reset lift on click */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .fileContextOptionWrapper {
-    width: 100px;
+    width: 160px;
     position: fixed;
-    border: 1.5px solid black;
+    border: 1px solid #e0e0e0;
     background: white;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     z-index: 1000;
+    overflow: hidden; /* Ensures child elements respect border radius */
 }
 
 .fileContextOption {
-    padding: 8px 12px;
+    padding: 10px 16px;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    font-size: 14px;
+    color: #333;
+    transition: all 0.2s ease;
+    border-bottom: 1px solid #f0f0f0; /* Separator between options */
+}
+
+.fileContextOption:last-child {
+    border-bottom: none; /* Remove border for the last item */
 }
 
 .fileContextOption:hover {
-    background-color: #f0f0f0;
+    background-color: #f8f8f8;
+    color: #000;
+    transform: translateX(4px); /* Slight shift on hover */
+}
+
+.fileContextOption:active {
+    background-color: #e0e0e0; /* Darker background on click */
 }

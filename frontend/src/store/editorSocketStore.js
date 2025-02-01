@@ -17,17 +17,34 @@ export const useEditorSocketStore = create((set) => ({
 
         incomingSocket?.on("wirteFileSuccess", (data) => {
             console.log("File write successfully:", data);
-            // incomingSocket.emit("readFile", {
-            //     pathTofileOrFolder: data.path
-            // });
+        });
+
+        incomingSocket?.on("createFileSuccess", () => {
+            console.log("crete file response socket");
+            projectTreeStructureSetter();
         });
 
         incomingSocket?.on("deleteFileSuccess", () => {
             projectTreeStructureSetter();
+        });
+
+        incomingSocket?.on("deleteFolderSuccess", () => {
+            console.log("rename successfully");
+            projectTreeStructureSetter();
+        });
+
+        incomingSocket?.on("createFolderSuccess", () => {
+            console.log("create a folder successfully");
+            projectTreeStructureSetter();
         })
 
+        incomingSocket?.on("renameSuccess", () => {
+            projectTreeStructureSetter();
+        })
         set({
             editorSocket: incomingSocket,
         })
+
+
     }
 }));
