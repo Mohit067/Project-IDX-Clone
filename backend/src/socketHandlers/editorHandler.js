@@ -18,6 +18,8 @@ export const handleEditorSocketEvent = (socket, editorNamespace) => {
         }
     });
 
+
+
     // read file
     socket.on("readFile", async( { pathTofileOrFolder }) => {
         try {

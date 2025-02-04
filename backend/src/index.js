@@ -6,19 +6,21 @@ import { Server } from 'socket.io';
 import { createServer } from 'node:http';
 import chokidar from 'chokidar';
 import { handleEditorSocketEvent } from "./socketHandlers/editorHandler.js";
-import { handleContainerCreate } from "./containers/handleContainerCreate.js";
+import { handleContainerCreate, listContainer } from "./containers/handleContainerCreate.js";
+import { WebSocketServer } from "ws";
+import { handleTerminalCreation } from "./containers/handleTerminalCreation.js";
 
 const app = express(); // it handle http request
 const server = createServer(app); // handle webSocket request
 const io = new Server(server, {
     cors: {
         origin: '*',
-        method: ['GET', 'POST']
+        methods: ['GET', 'POST']
     }
 });
 
 app.use(express.json());// middleware
-app.use(express.urlencoded());// middleware: request body ko accept kr skte hai
+app.use(express.urlencoded({ extended: true }));// middleware: request body ko accept kr skte hai
 app.use(cors());// middleware
 
 
@@ -56,34 +58,58 @@ editorNamespace.on("connection", (socket) => {
         });
     }
 
+    socket.on("getPort", () => {
+        console.log("get port event  recieved");
+        listContainer();
+    })
+
     handleEditorSocketEvent(socket, editorNamespace);
 
-    // socket.on("disconnect", async () => {
-    //     await watcher.close();
-    //     console.log("editor disconnect");
-    // });
-
 });
 
-const terminalNamespace = io.of('/terminal');
 
-terminalNamespace.on("connection", (socket) => {
-    console.log("terminal connected");
-
-    let projectId = socket.handshake.query['projectId'];
-
-    socket.on("shell-input", (data) => {
-        console.log("Input recieved", data);
-        terminalNamespace.emit("shell-output", data);
-    });
-
-    socket.on("disconnect",() => {
-        console.log("terminal disconnected")
-    });
-
-    handleContainerCreate(projectId, socket);
-});
+    
 
 server.listen(PORT, () => {
     console.log(`Server is running on ${PORT}`);
+    console.log(process.cwd());
 }); 
+
+
+const webSocketForTerminal = new WebSocketServer({ noServer: true });  // we will hadle the upgragde event
+
+webSocketForTerminal.on("connection", (ws, req, container) => {
+    console.log("terminal connect",container);
+    handleTerminalCreation(container, ws);
+
+    
+
+    ws.on("close", () => {
+        container.remove({ force: true }, (err, data) => {
+            if(err){
+                console.log("Error while removing the container", err);
+            }
+            console.log("container removed", data);
+        });
+    })
+});
+
+server.on("upgrade", (req, tcp, head) => {  // Raise the fronted request
+    /**
+     * req: Incoming http request
+     * socket: TCP socket
+     * head: Buffer containing the first package of the upgraded stream
+     */
+    //this callback will be called when client tries to connect to the server through wesocketServer
+
+    const isTerminal = req.url.includes('/terminal');
+
+    if(isTerminal){
+        console.log("Request url recieved", req.url);
+        let projectId = req.url.split("=")[1];
+        console.log("Project id recieved after connection", projectId);
+
+        handleContainerCreate(projectId, webSocketForTerminal, req, tcp, head);
+    }
+});
+
