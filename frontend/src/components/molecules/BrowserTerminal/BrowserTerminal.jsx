@@ -33,25 +33,10 @@ export const BrowserTerminal = () => {
                 selection: "rgba(255, 255, 255, 0.2)",
                 black: "#000000",
                 red: "#ff5544",
-                green: "#44cc44",
                 yellow: "#ffcc00",
-                // blue: "#4488ff",
-                // magenta: "#aa44ff",
-                // cyan: "#00cccc",
-                // white: "#f8f8f3",
-                // brightBlack: "#3c3c3c",
-                // brightRed: "#ff6666",
-                // brightGreen: "#66ff66",
-                // brightYellow: "#ffff66",
-                // brightBlue: "#66aaff",
-                // brightMagenta: "#cc66ff",
-                // brightCyan: "#66ffff",
-                // brightWhite: "#ffffff",
-                // orange: "#ff8800",
-                // pink: "#ff66aa",
-                // purple: "#9a5aff",
-                // teal: "#008080",
+                
             },
+            
             fontSize: 16,
             fontFamily: "'Fira Code', 'Ubuntu Mono', monospace",
             rightClickSelectsWord: true,
@@ -76,6 +61,7 @@ export const BrowserTerminal = () => {
  
         return () => {
             term.dispose();
+            terminalSocket?.close();
         }
 
     }, [terminalSocket]);
@@ -84,10 +70,6 @@ export const BrowserTerminal = () => {
 
         <div
             ref={terminalRef}
-            style={{
-                height: "25vh",
-                overflow: "auto"
-            }}
             className="terminal"
             id="terminal-container"
         >

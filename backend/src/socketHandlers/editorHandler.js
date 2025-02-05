@@ -1,4 +1,5 @@
 import fs from "fs/promises"; 
+import { getContainerPort } from "../containers/handleContainerCreate.js";
 
 export const handleEditorSocketEvent = (socket, editorNamespace) => {
 
@@ -144,5 +145,13 @@ export const handleEditorSocketEvent = (socket, editorNamespace) => {
             });
         }
     });
+
+    socket.on("getPort", async ({ containrName }) => {
+        const port = await getContainerPort(containrName);
+        console.log("port data", port);
+        socket.emit("getPortSuccess", {
+            port: port,
+        })
+    })
 
 }

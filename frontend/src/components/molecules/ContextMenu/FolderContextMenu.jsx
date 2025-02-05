@@ -1,4 +1,4 @@
-// import './FolderContextMenu.css'
+import './FolderContextMenu.css'
 
 import { useEditorSocketStore } from '../../../store/editorSocketStore';
 import { useFolderContextMenuStore } from '../../../store/folderContextMenuStore';
